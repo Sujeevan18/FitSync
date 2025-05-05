@@ -32,7 +32,8 @@ const CreateWorkoutPlan = () => {
         setDate(data.date);
         setEditWorkoutPlans(true);
       } catch (error) {
-        console.error("Error fetching workout plan:", error);
+        console.error("Error fetching workout plan:", error.response || error);
+        toast.error("Failed to fetch workout plan");
       }
     };
 
@@ -84,6 +85,9 @@ const CreateWorkoutPlan = () => {
       workoutPlanName: selectedWorkout,
     };
 
+    // Log the workout data being sent
+    console.log("Workout data being sent:", workoutData);
+
     try {
       const res = editWorkoutPlans
         ? await axios.put(
@@ -99,10 +103,18 @@ const CreateWorkoutPlan = () => {
             : "Workout Plan Added Successfully"
         );
         resetForm();
-        navigate("/");
+        navigate("/workoutplan");
       }
     } catch (error) {
-      console.error("Submission error:", error);
+      console.error("Error occurred during submission:", error.response || error);
+      if (error.response) {
+        // Log the response error from the backend
+        console.error("Response error:", error.response.data);
+        console.error("Response status:", error.response.status);
+      } else {
+        // Log any other errors (network issues, etc.)
+        console.error("Error message:", error.message);
+      }
       toast.error(
         editWorkoutPlans
           ? "Failed to update workout plan"
@@ -114,7 +126,7 @@ const CreateWorkoutPlan = () => {
   const goToWorkoutPlans = (e) => {
     e.preventDefault();
     resetForm();
-    navigate("/workoutplan");
+    navigate("/");
   };
 
   return (
