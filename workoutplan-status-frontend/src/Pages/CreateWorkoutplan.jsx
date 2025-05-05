@@ -1,19 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import backgroundImg from "../images/workoutBck.jpg";
-import chestImg from "../images/chestImg.png";
-import backImg from "../images/backImage.jpg";
-import armsImg from "../images/armsImage.jpg";
-import legsImg from "../images/legsImage.png";
 import toast from "react-hot-toast";
 import axios from "axios";
-
-const workoutTypes = [
-  { name: "Chest", image: chestImg },
-  { name: "Back", image: backImg },
-  { name: "Arms", image: armsImg },
-  { name: "Legs", image: legsImg },
-];
 
 const CreateWorkoutPlan = () => {
   const [selectedWorkout, setSelectedWorkout] = useState("Chest");
@@ -43,10 +31,12 @@ const CreateWorkoutPlan = () => {
         setDate(data.date);
         setEditWorkoutPlans(true);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching workout plan:", error);
       }
     };
-    fetchSingleWorkoutPlan();
+    if (workoutPlanId) {
+      fetchSingleWorkoutPlan();
+    }
   }, [workoutPlanId]);
 
   useEffect(() => {
@@ -54,9 +44,18 @@ const CreateWorkoutPlan = () => {
     setUser(user);
   }, []);
 
+  const resetForm = () => {
+    setSelectedWorkout("Chest");
+    setExercises("");
+    setSets("");
+    setRoutine("");
+    setRepetitions("");
+    setDescription("");
+    setDate("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return;
 
     if (
       !selectedWorkout ||
@@ -64,17 +63,18 @@ const CreateWorkoutPlan = () => {
       !sets ||
       !routine ||
       !repetitions ||
-      !description
+      !description ||
+      !date
     ) {
       return toast.error("Please fill all the fields");
     }
 
     const workoutData = {
-      sets,
+      sets: Number(sets),
       routine,
       date,
       exercises,
-      repetitions,
+      repetitions: Number(repetitions),
       description,
       workoutPlanName: selectedWorkout,
     };
@@ -87,39 +87,33 @@ const CreateWorkoutPlan = () => {
           )
         : await axios.post(`http://localhost:8080/workoutplan`, workoutData);
 
-      if (res.status === 200 || res.status === 201) {
+      if (res.status >= 200 && res.status < 300) {
         toast.success(
           editWorkoutPlans
-            ? "Workout Plans Updated Successfully"
-            : "Workout Plans added Successfully"
+            ? "Workout Plan Updated Successfully"
+            : "Workout Plan Added Successfully"
         );
-        setSets("");
-        setRoutine("");
-        setDate("");
-        setExercises("");
-        setRepetitions("");
-        setDescription("");
-        setSelectedWorkout("");
+        resetForm();
         navigate("/");
       }
     } catch (error) {
+      console.error("Submission error:", error);
       toast.error(
         editWorkoutPlans
-          ? "Failed to update workout plans"
-          : "Failed to add workout plans"
+          ? "Failed to update workout plan"
+          : "Failed to add workout plan"
       );
     }
   };
 
-  const goToWorkoutPlans = () => {
+  const goToWorkoutPlans = (e) => {
+    e.preventDefault();
+    resetForm();
     navigate("/");
   };
 
   return (
-    <div
-      className="min-h-screen p-4 bg-cover bg-center"
-      style={{ backgroundImage: `url(${backgroundImg})` }}
-    >
+    <div>
       <form
         onSubmit={handleSubmit}
         className="max-w mx-auto my-6 bg-white p-12 rounded-lg shadow-md"
@@ -128,74 +122,38 @@ const CreateWorkoutPlan = () => {
           {editWorkoutPlans ? "Edit Workout Plan" : "Create Workout Plan"}
         </h1>
         <div className="text-center mb-4">Please select your Routine</div>
+
         <div className="space-y-8">
           <div className="mb-4">
-            <div className="flex flex-wrap justify-center items-center bg-white">
-              {workoutTypes.map((workout, index) => (
-                <div key={index} className="p-4">
-                  <div
-                    className={`cursor-pointer rounded-lg overflow-hidden transition-transform transform ${
-                      selectedWorkout === workout.name
-                        ? "ring-4 ring-indigo-500"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedWorkout(workout.name)}
-                  >
-                    <img
-                      src={workout.image}
-                      alt={workout.name}
-                      className="w-36 h-24 object-cover"
-                    />
-                    <div
-                      className={`p-2 text-center ${
-                        selectedWorkout === workout.name
-                          ? "bg-indigo-600 text-white"
-                          : "bg-white text-gray-800"
-                      }`}
-                    >
-                      {workout.name}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <label htmlFor="routine" className="block text-sm font-medium text-gray-700">
+              Routine Name
+            </label>
+            <input
+              type="text"
+              id="routine"
+              value={routine}
+              onChange={(e) => setRoutine(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter routine name"
+            />
+          </div>
 
-            <div className="mb-4">
-              <label
-                htmlFor="routine"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Routine Name
-              </label>
-              <input
-                type="text"
-                id="routine"
-                value={routine}
-                onChange={(e) => setRoutine(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter routine name"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="exercises"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Exercise Name
-              </label>
-              <input
-                type="text"
-                id="exercises"
-                value={exercises}
-                onChange={(e) => setExercises(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter exercise name"
-              />
-            </div>
-            <label
-              htmlFor="sets"
-              className="block text-sm font-medium text-gray-700"
-            >
+          <div className="mb-4">
+            <label htmlFor="exercises" className="block text-sm font-medium text-gray-700">
+              Exercise Name
+            </label>
+            <input
+              type="text"
+              id="exercises"
+              value={exercises}
+              onChange={(e) => setExercises(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter exercise name"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="sets" className="block text-sm font-medium text-gray-700">
               Sets Count
             </label>
             <input
@@ -207,11 +165,9 @@ const CreateWorkoutPlan = () => {
               placeholder="Enter sets count"
             />
           </div>
+
           <div className="mb-4">
-            <label
-              htmlFor="repetitions"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="repetitions" className="block text-sm font-medium text-gray-700">
               Repetitions
             </label>
             <input
@@ -223,25 +179,21 @@ const CreateWorkoutPlan = () => {
               placeholder="Enter repetitions count"
             />
           </div>
-          <div className="relative max-w-sm">
-            <label
-              htmlFor="date"
-              className="block text-sm font-medium text-gray-700"
-            >
+
+          <div className="mb-4">
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
               Select Date
             </label>
             <input
               type="date"
+              value={date}
               onChange={(e) => setDate(e.target.value)}
               className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-              placeholder="Select date"
             />
           </div>
+
           <div className="mb-6">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
               Description of your workout
             </label>
             <textarea
@@ -254,6 +206,7 @@ const CreateWorkoutPlan = () => {
             ></textarea>
           </div>
         </div>
+
         <button
           type="submit"
           className="w-full mt-6 px-4 py-2 text-sm font-medium text-white bg-black rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -262,7 +215,8 @@ const CreateWorkoutPlan = () => {
         </button>
         <button
           onClick={goToWorkoutPlans}
-          className="w-full px-4 mt-2 py-2 text-sm font-medium text-black bg-transparent rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          type="button"
+          className="w-full px-4 mt-2 py-2 text-sm font-medium text-white bg-red-600 rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Cancel
         </button>

@@ -31,19 +31,22 @@ const CreateWorkoutStatus = () => {
         }
       };
       fetchSinglePost();
+    } else {
+      const today = new Date().toISOString().split("T")[0];
+      setDate(today);
     }
   }, [statusId]);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    setUser(user);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+    }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user || !distance || !pushups || !weight || !description || !date) {
-      return toast.error("Please fill all the fields");
-    }
 
     const workoutStatusData = {
       userId: user.id,
@@ -68,6 +71,15 @@ const CreateWorkoutStatus = () => {
     }
   };
 
+  const handleCancel = () => {
+    setDistance("");
+    setPushups("");
+    setWeight("");
+    setDescription("");
+    const today = new Date().toISOString().split("T")[0];
+    setDate(today);
+  };
+
   return (
     <div className="min-h-screen p-4 bg-gray-100">
       <h1 className="text-2xl font-bold text-center mb-6">
@@ -86,6 +98,8 @@ const CreateWorkoutStatus = () => {
             onChange={(e) => setDistance(e.target.value)}
             className="w-full border px-3 py-2 rounded"
             placeholder="e.g. 5"
+            min="0"
+            step="any"
           />
         </div>
         <div className="mb-4">
@@ -97,6 +111,7 @@ const CreateWorkoutStatus = () => {
             onChange={(e) => setPushups(e.target.value)}
             className="w-full border px-3 py-2 rounded"
             placeholder="e.g. 30"
+            min="0"
           />
         </div>
         <div className="mb-4">
@@ -108,6 +123,8 @@ const CreateWorkoutStatus = () => {
             onChange={(e) => setWeight(e.target.value)}
             className="w-full border px-3 py-2 rounded"
             placeholder="e.g. 50"
+            min="0"
+            step="any"
           />
         </div>
         <div className="mb-4">
@@ -139,7 +156,7 @@ const CreateWorkoutStatus = () => {
         </button>
         <button
           type="button"
-          onClick={() => navigate("/")}
+          onClick={handleCancel}
           className="w-full mt-2 border py-2 rounded text-gray-700 hover:bg-gray-200"
         >
           Cancel
