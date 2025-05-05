@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import workoutBck from "../images/workoutBck.jpg";
 
 const CreateWorkoutPlan = () => {
   const [selectedWorkout, setSelectedWorkout] = useState("Chest");
@@ -15,12 +16,6 @@ const CreateWorkoutPlan = () => {
   const [user, setUser] = useState(null);
   const { workoutPlanId } = useParams();
   const navigate = useNavigate();
-
-  // Get today's date in YYYY-MM-DD format
-  const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  };
 
   useEffect(() => {
     const fetchSingleWorkoutPlan = async () => {
@@ -49,9 +44,8 @@ const CreateWorkoutPlan = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     setUser(user);
-
     if (!editWorkoutPlans) {
-      setDate(getTodayDate()); // Set default date to today
+      setDate(new Date().toISOString().split("T")[0]); // Set default date to today
     }
   }, [editWorkoutPlans]);
 
@@ -62,35 +56,22 @@ const CreateWorkoutPlan = () => {
     setRoutine("");
     setRepetitions("");
     setDescription("");
-    setDate(getTodayDate());
+    setDate(new Date().toISOString().split("T")[0]);
   };
 
   const validateForm = () => {
-    const newErrors = {};
-
-    if (!selectedWorkout.trim()) newErrors.selectedWorkout = "Workout is required";
-    if (!routine.trim()) newErrors.routine = "Routine is required";
-    if (!exercises.trim()) newErrors.exercises = "Exercise name is required";
-    if (!sets || isNaN(sets) || sets <= 0) newErrors.sets = "Sets must be a positive number";
-    if (!repetitions || isNaN(repetitions) || repetitions <= 0)
-      newErrors.repetitions = "Repetitions must be a positive number";
-    if (!description.trim()) newErrors.description = "Description is required";
-    if (!date) {
-      newErrors.date = "Date is required";
-    } else if (new Date(date) < new Date(getTodayDate())) {
-      newErrors.date = "Date cannot be in the past";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      Object.values(newErrors).forEach((msg) => toast.error(msg));
-      return false;
-    }
+    if (!selectedWorkout.trim()) return toast.error("Workout is required");
+    if (!routine.trim()) return toast.error("Routine is required");
+    if (!exercises.trim()) return toast.error("Exercise name is required");
+    if (!sets || isNaN(sets) || sets <= 0) return toast.error("Sets must be a positive number");
+    if (!repetitions || isNaN(repetitions) || repetitions <= 0) return toast.error("Repetitions must be a positive number");
+    if (!description.trim()) return toast.error("Description is required");
+    if (!date) return toast.error("Date is required");
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     const workoutData = {
@@ -137,17 +118,28 @@ const CreateWorkoutPlan = () => {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        backgroundImage: `url(${workoutBck})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <form
         onSubmit={handleSubmit}
-        className="max-w mx-auto my-6 bg-white p-12 rounded-lg shadow-md"
+        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-xl"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.9)" }}
       >
-        <h1 className="mb-4 text-3xl font-semibold text-center text-indigo-600">
+        <h1 className="mb-6 text-3xl font-semibold text-center text-indigo-600">
           {editWorkoutPlans ? "Edit Workout Plan" : "Create Workout Plan"}
         </h1>
-        <div className="text-center mb-4">Please select your Routine</div>
+        <div className="text-center mb-4">Please fill in your workout details</div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           <div className="mb-4">
             <label htmlFor="routine" className="block text-sm font-medium text-gray-700">
               Routine Name
@@ -157,7 +149,7 @@ const CreateWorkoutPlan = () => {
               id="routine"
               value={routine}
               onChange={(e) => setRoutine(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter routine name"
             />
           </div>
@@ -171,7 +163,7 @@ const CreateWorkoutPlan = () => {
               id="exercises"
               value={exercises}
               onChange={(e) => setExercises(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter exercise name"
             />
           </div>
@@ -185,7 +177,7 @@ const CreateWorkoutPlan = () => {
               id="sets"
               value={sets}
               onChange={(e) => setSets(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter sets count"
             />
           </div>
@@ -199,7 +191,7 @@ const CreateWorkoutPlan = () => {
               id="repetitions"
               value={repetitions}
               onChange={(e) => setRepetitions(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter repetitions count"
             />
           </div>
@@ -212,7 +204,7 @@ const CreateWorkoutPlan = () => {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              min={getTodayDate()}
+              min={new Date().toISOString().split("T")[0]}
               className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
             />
           </div>
@@ -226,7 +218,7 @@ const CreateWorkoutPlan = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows="4"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Describe your workout achievements..."
             ></textarea>
           </div>
@@ -234,14 +226,14 @@ const CreateWorkoutPlan = () => {
 
         <button
           type="submit"
-          className="w-full mt-6 px-4 py-2 text-sm font-medium text-white bg-black rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="w-full mt-6 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Submit Workout Status
         </button>
         <button
           onClick={goToWorkoutPlans}
           type="button"
-          className="w-full px-4 mt-2 py-2 text-sm font-medium text-white bg-red-600 rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="w-full mt-4 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Cancel
         </button>
