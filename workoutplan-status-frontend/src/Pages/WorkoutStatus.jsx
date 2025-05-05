@@ -54,12 +54,6 @@ const WorkoutStatus = ({ user }) => {
         backgroundSize: 'cover',
         backgroundAttachment: 'fixed'
       }}>
-      <div className="flex justify-between items-center">
-        {/* <h1 className="text-3xl text-center font-semibold mb-4">
-          Workout Statuses
-        </h1> */}
-      </div>
-
       <div className="space-y-4 flex justify-center flex-col items-center">
         {workoutStatuses.map((status, index) => (
           <div
@@ -113,7 +107,6 @@ const WorkoutStatus = ({ user }) => {
         ))}
       </div>
     </div>
-    // </Layout>
   );
 };
 

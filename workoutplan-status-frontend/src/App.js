@@ -12,7 +12,7 @@ function App() {
       <Toaster position="top-center" />
       <Routes>
 
-      <Route path="/" element={<CreateWorkoutPlan />} />
+      <Route path="/"  />
         <Route path="/CreateWorkoutPlan" element={<CreateWorkoutPlan />} />
         <Route path="/CreateWorkoutPlan/:workoutPlanId" element={<CreateWorkoutPlan />} />
 

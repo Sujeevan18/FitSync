@@ -1,9 +1,70 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import toast from "react-hot-toast";
-import axios from "axios";
-import workoutBck from "../images/workoutBck.jpg"; // Background image for full UI
+import React, { useState, useEffect } from 'react';
+import { AiOutlineSend } from 'react-icons/ai';
+import axios from 'axios';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import workoutBck from '../images/workoutBck.jpg'; 
+import toast from 'react-hot-toast';
 
+// ChatBot Component
+const ChatBot = () => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+
+  const sendMessage = async () => {
+    if (!input) return;
+
+    const userMessage = { text: input, sender: "user" };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInput("");
+
+    try {
+      const response = await axios.post("https://api.openai.com/v1/completions", {
+        model: "text-davinci-003",
+        prompt: input,
+        max_tokens: 150,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer YOUR_OPENAI_API_KEY`, // Replace with your API Key
+        },
+      });
+
+      const botMessage = { text: response.data.choices[0].text.trim(), sender: "bot" };
+      setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
+    } catch (error) {
+      console.error("Error fetching response from OpenAI:", error);
+      const errorMessage = { text: "Sorry, I couldn't process your request.", sender: "bot" };
+      setMessages((prevMessages) => [...prevMessages, userMessage, errorMessage]);
+    }
+  };
+
+  return (
+    <div className="fixed top-0 right-0 m-4 w-96 h-96 bg-white shadow-lg rounded-lg p-4 flex flex-col">
+      <div className="flex-grow overflow-y-auto space-y-4">
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`p-2 rounded-lg ${message.sender === "user" ? "bg-blue-100 text-right" : "bg-gray-100 text-left"}`}
+          >
+            <p>{message.text}</p>
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center space-x-2 mt-4">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask me anything!"
+          className="flex-grow p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <AiOutlineSend onClick={sendMessage} className="cursor-pointer text-blue-500" size={24} />
+      </div>
+    </div>
+  );
+};
+
+// CreateWorkoutPlan Component
 const CreateWorkoutPlan = () => {
   const [selectedWorkout, setSelectedWorkout] = useState("Chest");
   const [exercises, setExercises] = useState("");
@@ -13,42 +74,44 @@ const CreateWorkoutPlan = () => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [editWorkoutPlans, setEditWorkoutPlans] = useState(false);
-  const [user, setUser] = useState(null);
+
   const { workoutPlanId } = useParams();
+  const location = useLocation();
+  const workoutplan = location.state?.workoutplan;
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchSingleWorkoutPlan = async () => {
-      try {
-        const { data } = await axios.get(
-          `http://localhost:8080/workoutplan/${workoutPlanId}`
-        );
-        setSelectedWorkout(data.workoutPlanName);
-        setExercises(data.exercises);
-        setSets(data.sets);
-        setRoutine(data.routine);
-        setRepetitions(data.repetitions);
-        setDescription(data.description);
-        setDate(data.date);
-        setEditWorkoutPlans(true);
-      } catch (error) {
-        console.error("Error fetching workout plan:", error.response || error);
-        toast.error("Failed to fetch workout plan");
-      }
-    };
-
-    if (workoutPlanId) {
+    if (workoutplan) {
+      setSelectedWorkout(workoutplan.workoutPlanName);
+      setExercises(workoutplan.exercises);
+      setSets(workoutplan.sets);
+      setRoutine(workoutplan.routine);
+      setRepetitions(workoutplan.repetitions);
+      setDescription(workoutplan.description);
+      setDate(workoutplan.date);
+      setEditWorkoutPlans(true);
+    } else if (workoutPlanId) {
+      const fetchSingleWorkoutPlan = async () => {
+        try {
+          const { data } = await axios.get(
+            `http://localhost:8080/workoutplan/${workoutPlanId}`
+          );
+          setSelectedWorkout(data.workoutPlanName);
+          setExercises(data.exercises);
+          setSets(data.sets);
+          setRoutine(data.routine);
+          setRepetitions(data.repetitions);
+          setDescription(data.description);
+          setDate(data.date);
+          setEditWorkoutPlans(true);
+        } catch (error) {
+          console.error("Error fetching workout plan:", error.response || error);
+          toast.error("Failed to fetch workout plan");
+        }
+      };
       fetchSingleWorkoutPlan();
     }
-  }, [workoutPlanId]);
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    setUser(user);
-    if (!editWorkoutPlans) {
-      setDate(new Date().toISOString().split("T")[0]); // Set default date to today
-    }
-  }, [editWorkoutPlans]);
+  }, [workoutplan, workoutPlanId]);
 
   const resetForm = () => {
     setSelectedWorkout("Chest");
@@ -85,9 +148,6 @@ const CreateWorkoutPlan = () => {
       workoutPlanName: selectedWorkout,
     };
 
-    // Log the workout data being sent
-    console.log("Workout data being sent:", workoutData);
-
     try {
       const res = editWorkoutPlans
         ? await axios.put(
@@ -103,30 +163,16 @@ const CreateWorkoutPlan = () => {
             : "Workout Plan Added Successfully"
         );
         resetForm();
-        navigate("/workoutplan");
+        navigate("/workoutplan"); // Navigate to workout plan list after submit
       }
     } catch (error) {
-      console.error("Error occurred during submission:", error.response || error);
-      if (error.response) {
-        // Log the response error from the backend
-        console.error("Response error:", error.response.data);
-        console.error("Response status:", error.response.status);
-      } else {
-        // Log any other errors (network issues, etc.)
-        console.error("Error message:", error.message);
-      }
+      console.error("Submission error:", error);
       toast.error(
         editWorkoutPlans
           ? "Failed to update workout plan"
           : "Failed to add workout plan"
       );
     }
-  };
-
-  const goToWorkoutPlans = (e) => {
-    e.preventDefault();
-    resetForm();
-    navigate("/");
   };
 
   return (
@@ -154,7 +200,7 @@ const CreateWorkoutPlan = () => {
         }}
       >
         <h1 className="mb-6 text-3xl font-semibold text-center text-indigo-600 animate__animated animate__fadeIn">
-          {editWorkoutPlans ? "Edit Workout Plan" : "Create Workout Plan"}
+          {editWorkoutPlans ? "Confirm Edit" : "Create Workout Plan"}
         </h1>
         <div className="text-center mb-4">Please fill in your workout details</div>
 
@@ -247,16 +293,17 @@ const CreateWorkoutPlan = () => {
           type="submit"
           className="w-full mt-6 px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
         >
-          Submit Workout Plan
+          {editWorkoutPlans ? "Confirm Edit" : "Submit Workout Plan"}
         </button>
         <button
-          onClick={goToWorkoutPlans}
+          onClick={() => navigate("/workoutplan")}
           type="button"
           className="w-full mt-4 px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
         >
-          Cancel
+          {editWorkoutPlans ? "Remove Edit" : "Cancel"}
         </button>
       </form>
+      <ChatBot /> {/* Embed ChatBot component */}
     </div>
   );
 };

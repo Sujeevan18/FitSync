@@ -7,7 +7,6 @@ import backgroundImg from '../images/workoutBck.jpg';
 
 const WorkoutPlan = ({ user }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,8 +30,9 @@ const WorkoutPlan = ({ user }) => {
         `http://localhost:8080/workoutplan/${workoutplans.workoutPlanId}`
       );
 
-      setWorkoutPlans((prevWokoutPlans) =>
-        prevWokoutPlans.filter((wp) => wp.workoutPlanId !== workoutplans.workoutPlanId)
+      // Filter out the deleted workout plan from the state
+      setWorkoutPlans((prevWorkoutPlans) =>
+        prevWorkoutPlans.filter((wp) => wp.workoutPlanId !== workoutplans.workoutPlanId)
       );
 
       toast.success("Workout Plan deleted successfully");
@@ -42,7 +42,9 @@ const WorkoutPlan = ({ user }) => {
   };
 
   const navigateEditPage = (workoutplans) => {
-    navigate(`/CreateWorkoutPlan/${workoutplans.workoutPlanId}`);
+    navigate(`/CreateWorkoutPlan/${workoutplans.workoutPlanId}`, {
+      state: { workoutplan: workoutplans }, // Pass the workout plan data to the form
+    });
   };
 
   return (
@@ -54,12 +56,13 @@ const WorkoutPlan = ({ user }) => {
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundAttachment: "fixed",
+        minHeight: "100vh",  // Ensure the background covers the full viewport height
       }}
     >
       <div className="space-y-4 flex justify-center flex-col items-center">
-        {workoutPlans.map((workoutplans, index) => (
+        {workoutPlans.map((workoutplans) => (
           <div
-            key={index}
+            key={workoutplans.workoutPlanId} // Use workoutPlanId as the unique key
             className="bg-white shadow-lg rounded-lg p-6 w-[600px] mt-6 bg-opacity-80"
           >
             <div className="flex justify-between mb-4">
@@ -72,10 +75,10 @@ const WorkoutPlan = ({ user }) => {
                   />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-white">
+                  <h2 className="text-lg font-semibold text-black">
                     {workoutplans?.username}
                   </h2>
-                  <p className="text-sm font-bold text-white mb-2">
+                  <p className="text-sm font-bold text-black mb-2">
                     Workout on {workoutplans.date}
                   </p>
                 </div>
@@ -102,18 +105,18 @@ const WorkoutPlan = ({ user }) => {
 
             <div>
               <div className="list-disc pl-5 space-y-1 mt-2">
-                <h2 className="text-xl font-semibold text-white mb-2">
+                <h2 className="text-xl font-semibold text-black mb-2">
                   {workoutplans.workoutPlanName}
                 </h2>
-                <p className="font-medium text-white">
+                <p className="font-medium text-black">
                   Exercise: {workoutplans.exercises}
                 </p>
-                <p className="text-sm text-white">Sets: {workoutplans.sets}</p>
-                <p className="text-sm text-white">
+                <p className="text-sm text-black">Sets: {workoutplans.sets}</p>
+                <p className="text-sm text-black">
                   Repetitions: {workoutplans.repetitions}
                 </p>
-                <p className="text-sm text-white">Routine: {workoutplans.routine}</p>
-                <p className="text-sm italic text-white">
+                <p className="text-sm text-black">Routine: {workoutplans.routine}</p>
+                <p className="text-sm italic text-black">
                   "{workoutplans.description}"
                 </p>
               </div>

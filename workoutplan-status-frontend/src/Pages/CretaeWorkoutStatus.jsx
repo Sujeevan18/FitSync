@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import chestImg from "../images/chestImg.png"; // Background image for full UI
@@ -13,33 +13,46 @@ const CreateWorkoutStatus = () => {
   const [user, setUser] = useState({});
   const [editStatus, setEditStatus] = useState(false);
 
-  const { statusId } = useParams();
-  const navigate = useNavigate();
+  const { statusId } = useParams(); // Get the statusId from the URL params
+  const navigate = useNavigate(); // Use navigate to redirect the user
+  const location = useLocation(); // To get the state passed via navigation
+
+  const workoutStatusData = location.state?.workoutStatus; // Get the workout status data from location.state
 
   const getTodayDate = () => new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    if (statusId) {
+    // If workoutStatusData is passed via location state, use it to pre-fill the form
+    if (workoutStatusData) {
+      setDistance(workoutStatusData.distance);
+      setPushups(workoutStatusData.pushups);
+      setWeight(workoutStatusData.weight);
+      setDescription(workoutStatusData.description);
+      setDate(workoutStatusData.date);
+      setEditStatus(true);
+    } else if (statusId) {
+      // If statusId is available, fetch data from the backend
       const fetchSinglePost = async () => {
         try {
           const { data } = await axios.get(
             `http://localhost:8080/WorkoutStatus/${statusId}`
           );
-          setWeight(data.weight);
           setDistance(data.distance);
           setPushups(data.pushUps);
+          setWeight(data.weight);
           setDescription(data.description);
           setDate(data.date);
           setEditStatus(true);
         } catch (error) {
           console.log(error);
+          toast.error("Failed to fetch workout status");
         }
       };
       fetchSinglePost();
     } else {
       setDate(getTodayDate());
     }
-  }, [statusId]);
+  }, [statusId, workoutStatusData]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -58,11 +71,9 @@ const CreateWorkoutStatus = () => {
       errors.push("Please enter a valid non-negative push-up count.");
     if (!weight || isNaN(weight) || Number(weight) < 0)
       errors.push("Please enter a valid non-negative weight.");
-    if (!description.trim())
-      errors.push("Workout description is required.");
-    if (!date) {
-      errors.push("Date is required.");
-    } else if (new Date(date) < new Date(getTodayDate())) {
+    if (!description.trim()) errors.push("Workout description is required.");
+    if (!date) errors.push("Date is required.");
+    else if (new Date(date) < new Date(getTodayDate())) {
       errors.push("Date cannot be in the past.");
     }
 
@@ -98,10 +109,20 @@ const CreateWorkoutStatus = () => {
 
       if (res.status === 200 || res.status === 201) {
         toast.success(editStatus ? "Workout status updated" : "Workout status added");
-        navigate("/");
+        navigate("/WorkoutStatus");
       }
     } catch (error) {
       toast.error("Failed to save workout status");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8080/WorkoutStatus/${statusId}`);
+      toast.success("Workout status deleted successfully");
+      navigate("/WorkoutStatus");
+    } catch (error) {
+      toast.error("Failed to delete workout status");
     }
   };
 
@@ -133,7 +154,7 @@ const CreateWorkoutStatus = () => {
         }}
       >
         <h1 className="text-2xl font-bold text-center text-indigo-600 mb-6">
-          {editStatus ? "Edit Workout Status" : "Create Workout Status"}
+          {editStatus ? "Confirm Edit" : "Create Workout Status"}
         </h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -211,12 +232,21 @@ const CreateWorkoutStatus = () => {
               type="submit"
               className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
             >
-              {editStatus ? "Update Status" : "Create Status"}
+              {editStatus ? "Confirm Edit" : "Create Status"}
             </button>
+            {editStatus && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
+              >
+                Remove Edit
+              </button>
+            )}
             <button
               type="button"
               onClick={handleCancel}
-              className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
+              className="w-full px-6 py-2 text-sm font-medium text-white bg-gray-600 rounded-full shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-300"
             >
               Cancel
             </button>
