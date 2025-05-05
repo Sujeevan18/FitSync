@@ -15,11 +15,15 @@ const CreateWorkoutStatus = () => {
   const { statusId } = useParams();
   const navigate = useNavigate();
 
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (statusId) {
       const fetchSinglePost = async () => {
         try {
-          const { data } = await axios.get(`http://localhost:8080/WorkoutStatus/${statusId}`);
+          const { data } = await axios.get(
+            `http://localhost:8080/WorkoutStatus/${statusId}`
+          );
           setWeight(data.weight);
           setDistance(data.distance);
           setPushups(data.pushUps);
@@ -32,8 +36,7 @@ const CreateWorkoutStatus = () => {
       };
       fetchSinglePost();
     } else {
-      const today = new Date().toISOString().split("T")[0];
-      setDate(today);
+      setDate(getTodayDate());
     }
   }, [statusId]);
 
@@ -45,8 +48,35 @@ const CreateWorkoutStatus = () => {
     }
   }, []);
 
+  const validateForm = () => {
+    const errors = [];
+
+    if (!distance || isNaN(distance) || Number(distance) < 0)
+      errors.push("Please enter a valid non-negative distance.");
+    if (!pushups || isNaN(pushups) || Number(pushups) < 0)
+      errors.push("Please enter a valid non-negative push-up count.");
+    if (!weight || isNaN(weight) || Number(weight) < 0)
+      errors.push("Please enter a valid non-negative weight.");
+    if (!description.trim())
+      errors.push("Workout description is required.");
+    if (!date) {
+      errors.push("Date is required.");
+    } else if (new Date(date) < new Date(getTodayDate())) {
+      errors.push("Date cannot be in the past.");
+    }
+
+    if (errors.length > 0) {
+      errors.forEach((err) => toast.error(err));
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
 
     const workoutStatusData = {
       userId: user.id,
@@ -59,7 +89,10 @@ const CreateWorkoutStatus = () => {
 
     try {
       const res = editStatus
-        ? await axios.put(`http://localhost:8080/WorkoutStatus/${statusId}`, workoutStatusData)
+        ? await axios.put(
+            `http://localhost:8080/WorkoutStatus/${statusId}`,
+            workoutStatusData
+          )
         : await axios.post("http://localhost:8080/WorkoutStatus", workoutStatusData);
 
       if (res.status === 200 || res.status === 201) {
@@ -76,8 +109,7 @@ const CreateWorkoutStatus = () => {
     setPushups("");
     setWeight("");
     setDescription("");
-    const today = new Date().toISOString().split("T")[0];
-    setDate(today);
+    setDate(getTodayDate());
   };
 
   return (
@@ -134,6 +166,7 @@ const CreateWorkoutStatus = () => {
             id="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            min={getTodayDate()}
             className="w-full border px-3 py-2 rounded"
           />
         </div>

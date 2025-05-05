@@ -16,6 +16,12 @@ const CreateWorkoutPlan = () => {
   const { workoutPlanId } = useParams();
   const navigate = useNavigate();
 
+  // Get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+
   useEffect(() => {
     const fetchSingleWorkoutPlan = async () => {
       try {
@@ -34,6 +40,7 @@ const CreateWorkoutPlan = () => {
         console.error("Error fetching workout plan:", error);
       }
     };
+
     if (workoutPlanId) {
       fetchSingleWorkoutPlan();
     }
@@ -42,7 +49,11 @@ const CreateWorkoutPlan = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     setUser(user);
-  }, []);
+
+    if (!editWorkoutPlans) {
+      setDate(getTodayDate()); // Set default date to today
+    }
+  }, [editWorkoutPlans]);
 
   const resetForm = () => {
     setSelectedWorkout("Chest");
@@ -51,23 +62,36 @@ const CreateWorkoutPlan = () => {
     setRoutine("");
     setRepetitions("");
     setDescription("");
-    setDate("");
+    setDate(getTodayDate());
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!selectedWorkout.trim()) newErrors.selectedWorkout = "Workout is required";
+    if (!routine.trim()) newErrors.routine = "Routine is required";
+    if (!exercises.trim()) newErrors.exercises = "Exercise name is required";
+    if (!sets || isNaN(sets) || sets <= 0) newErrors.sets = "Sets must be a positive number";
+    if (!repetitions || isNaN(repetitions) || repetitions <= 0)
+      newErrors.repetitions = "Repetitions must be a positive number";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (!date) {
+      newErrors.date = "Date is required";
+    } else if (new Date(date) < new Date(getTodayDate())) {
+      newErrors.date = "Date cannot be in the past";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      Object.values(newErrors).forEach((msg) => toast.error(msg));
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !selectedWorkout ||
-      !exercises ||
-      !sets ||
-      !routine ||
-      !repetitions ||
-      !description ||
-      !date
-    ) {
-      return toast.error("Please fill all the fields");
-    }
+    if (!validateForm()) return;
 
     const workoutData = {
       sets: Number(sets),
@@ -188,6 +212,7 @@ const CreateWorkoutPlan = () => {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              min={getTodayDate()}
               className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
             />
           </div>
