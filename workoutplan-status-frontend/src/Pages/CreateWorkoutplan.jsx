@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
-import workoutBck from "../images/workoutBck.jpg";
+import workoutBck from "../images/workoutBck.jpg"; // Background image for full UI
 
 const CreateWorkoutPlan = () => {
   const [selectedWorkout, setSelectedWorkout] = useState("Chest");
@@ -114,7 +114,7 @@ const CreateWorkoutPlan = () => {
   const goToWorkoutPlans = (e) => {
     e.preventDefault();
     resetForm();
-    navigate("/");
+    navigate("/workoutplan");
   };
 
   return (
@@ -127,20 +127,27 @@ const CreateWorkoutPlan = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        padding: "20px",
       }}
     >
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-xl"
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.9)" }}
+        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-xl transform transition-all duration-500"
+        style={{
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          padding: "30px",
+          borderRadius: "15px",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+          animation: "fadeIn 0.8s ease-out",
+        }}
       >
-        <h1 className="mb-6 text-3xl font-semibold text-center text-indigo-600">
+        <h1 className="mb-6 text-3xl font-semibold text-center text-indigo-600 animate__animated animate__fadeIn">
           {editWorkoutPlans ? "Edit Workout Plan" : "Create Workout Plan"}
         </h1>
         <div className="text-center mb-4">Please fill in your workout details</div>
 
         <div className="space-y-6">
-          <div className="mb-4">
+          <div className="mb-6">
             <label htmlFor="routine" className="block text-sm font-medium text-gray-700">
               Routine Name
             </label>
@@ -149,12 +156,12 @@ const CreateWorkoutPlan = () => {
               id="routine"
               value={routine}
               onChange={(e) => setRoutine(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="Enter routine name"
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label htmlFor="exercises" className="block text-sm font-medium text-gray-700">
               Exercise Name
             </label>
@@ -163,12 +170,12 @@ const CreateWorkoutPlan = () => {
               id="exercises"
               value={exercises}
               onChange={(e) => setExercises(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="Enter exercise name"
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label htmlFor="sets" className="block text-sm font-medium text-gray-700">
               Sets Count
             </label>
@@ -177,12 +184,12 @@ const CreateWorkoutPlan = () => {
               id="sets"
               value={sets}
               onChange={(e) => setSets(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="Enter sets count"
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label htmlFor="repetitions" className="block text-sm font-medium text-gray-700">
               Repetitions
             </label>
@@ -191,12 +198,12 @@ const CreateWorkoutPlan = () => {
               id="repetitions"
               value={repetitions}
               onChange={(e) => setRepetitions(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="Enter repetitions count"
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label htmlFor="date" className="block text-sm font-medium text-gray-700">
               Select Date
             </label>
@@ -205,7 +212,7 @@ const CreateWorkoutPlan = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               min={new Date().toISOString().split("T")[0]}
-              className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+              className="bg-gray-50 border-2 border-gray-300 text-gray-900 sm:text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
             />
           </div>
 
@@ -218,7 +225,7 @@ const CreateWorkoutPlan = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows="4"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="Describe your workout achievements..."
             ></textarea>
           </div>
@@ -226,14 +233,14 @@ const CreateWorkoutPlan = () => {
 
         <button
           type="submit"
-          className="w-full mt-6 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="w-full mt-6 px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
         >
-          Submit Workout Status
+          Submit Workout Plan
         </button>
         <button
           onClick={goToWorkoutPlans}
           type="button"
-          className="w-full mt-4 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="w-full mt-4 px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
         >
           Cancel
         </button>

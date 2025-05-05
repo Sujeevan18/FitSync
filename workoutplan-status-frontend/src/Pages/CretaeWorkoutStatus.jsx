@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import toast from "react-hot-toast";
-import chestImg from "../images/chestImg.png"; // The image you want to use as background
+import axios from "axios";
+import chestImg from "../images/chestImg.png"; // Background image for full UI
 
 const CreateWorkoutStatus = () => {
   const [distance, setDistance] = useState("");
@@ -120,13 +120,16 @@ const CreateWorkoutStatus = () => {
         backgroundImage: `url(${chestImg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundAttachment: "fixed",
         padding: "20px",
+        animation: "fadeIn 1s ease-in-out",
       }}
     >
       <div
-        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg relative"
+        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg relative z-10"
         style={{
-          backgroundColor: "rgba(255, 255, 255, 0.8)", // Slight opacity for better readability
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          animation: "slideUp 0.5s ease-out",
         }}
       >
         <h1 className="text-2xl font-bold text-center text-indigo-600 mb-6">
@@ -134,61 +137,71 @@ const CreateWorkoutStatus = () => {
         </h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="distance" className="block text-sm font-medium">Distance (km)</label>
+            <label htmlFor="distance" className="block text-sm font-medium">
+              Distance (km)
+            </label>
             <input
               type="number"
               id="distance"
               value={distance}
               onChange={(e) => setDistance(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="e.g. 5"
               min="0"
               step="any"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="pushups" className="block text-sm font-medium">Push-ups</label>
+            <label htmlFor="pushups" className="block text-sm font-medium">
+              Push-ups
+            </label>
             <input
               type="number"
               id="pushups"
               value={pushups}
               onChange={(e) => setPushups(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="e.g. 30"
               min="0"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="weight" className="block text-sm font-medium">Weight (kg)</label>
+            <label htmlFor="weight" className="block text-sm font-medium">
+              Weight (kg)
+            </label>
             <input
               type="number"
               id="weight"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="e.g. 50"
               min="0"
               step="any"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="date" className="block text-sm font-medium">Date</label>
+            <label htmlFor="date" className="block text-sm font-medium">
+              Date
+            </label>
             <input
               type="date"
               id="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               min={getTodayDate()}
-              className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
             />
           </div>
           <div className="mb-6">
-            <label htmlFor="description" className="block text-sm font-medium">Workout Description</label>
+            <label htmlFor="description" className="block text-sm font-medium">
+              Workout Description
+            </label>
             <textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               rows="4"
               placeholder="Describe your workout..."
             />
@@ -196,14 +209,14 @@ const CreateWorkoutStatus = () => {
           <div className="flex justify-between">
             <button
               type="submit"
-              className="bg-green-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-green-700 transition duration-300"
+              className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
             >
               {editStatus ? "Update Status" : "Create Status"}
             </button>
             <button
               type="button"
               onClick={handleCancel}
-              className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md shadow-md hover:bg-gray-300 transition duration-300"
+              className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
             >
               Cancel
             </button>

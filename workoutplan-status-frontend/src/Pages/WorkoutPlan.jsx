@@ -5,12 +5,10 @@ import toast from 'react-hot-toast';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import backgroundImg from '../images/workoutBck.jpg';
 
-
 const WorkoutPlan = ({ user }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const fetchWorkoutPlans = async () => {
@@ -43,15 +41,9 @@ const WorkoutPlan = ({ user }) => {
     }
   };
 
-
   const navigateEditPage = (workoutplans) => {
     navigate(`/CreateWorkoutPlan/${workoutplans.workoutPlanId}`);
   };
-
-  // Function to handle click event
-  // const goToWorkoutPlan = () => {
-  //   navigate('/CreateWorkoutPlan'); // Use the route you want to navigate to
-  // };
 
   return (
     <div
@@ -64,22 +56,13 @@ const WorkoutPlan = ({ user }) => {
         backgroundAttachment: "fixed",
       }}
     >
-      <div className="flex justify-between items-center">
-        {/* <button
-          onClick={goToWorkoutPlan}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-        >
-          Create New Workout Plan
-        </button> */}
-      </div>
-
       <div className="space-y-4 flex justify-center flex-col items-center">
         {workoutPlans.map((workoutplans, index) => (
           <div
             key={index}
-            className="bg-white shadow-lg rounded-lg p-4 w-[600px]"
+            className="bg-white shadow-lg rounded-lg p-6 w-[600px] mt-6 bg-opacity-80"
           >
-            <div className="flex justify-between ">
+            <div className="flex justify-between mb-4">
               <div className="flex gap-3">
                 <div>
                   <img
@@ -89,10 +72,10 @@ const WorkoutPlan = ({ user }) => {
                   />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold">
+                  <h2 className="text-lg font-semibold text-white">
                     {workoutplans?.username}
                   </h2>
-                  <p className="text-sm font-bold mb-2">
+                  <p className="text-sm font-bold text-white mb-2">
                     Workout on {workoutplans.date}
                   </p>
                 </div>
@@ -119,18 +102,20 @@ const WorkoutPlan = ({ user }) => {
 
             <div>
               <div className="list-disc pl-5 space-y-1 mt-2">
-                <h2 className="text-xl font-semibold mb-2">
+                <h2 className="text-xl font-semibold text-white mb-2">
                   {workoutplans.workoutPlanName}
                 </h2>
-                <p className="font-medium">
+                <p className="font-medium text-white">
                   Exercise: {workoutplans.exercises}
                 </p>
-                <p className="text-sm">Sets: {workoutplans.sets}</p>
-                <p className="text-sm">
+                <p className="text-sm text-white">Sets: {workoutplans.sets}</p>
+                <p className="text-sm text-white">
                   Repetitions: {workoutplans.repetitions}
                 </p>
-                <p className="text-sm">Routine: {workoutplans.routine}</p>
-                <p className="text-sm italic">"{workoutplans.description}"</p>
+                <p className="text-sm text-white">Routine: {workoutplans.routine}</p>
+                <p className="text-sm italic text-white">
+                  "{workoutplans.description}"
+                </p>
               </div>
             </div>
           </div>
@@ -139,6 +124,5 @@ const WorkoutPlan = ({ user }) => {
     </div>
   );
 };
-
 
 export default WorkoutPlan;
