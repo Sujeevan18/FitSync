@@ -25,8 +25,6 @@ public class SecurityConfig {
                                 "/user/**",
                                 "/posts/**",
                                 "/media/**",
-                                "/learningSystem/**", 
-                                "/learningProgress/**", 
                                 "/notifications/**" 
                         ).permitAll()
                         .anyRequest().authenticated()

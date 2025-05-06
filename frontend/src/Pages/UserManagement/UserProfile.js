@@ -127,32 +127,6 @@ function UserProfile() {
             View and manage all the posts you've created on Plusecore.
           </p>
         </div>
-
-        <div
-          className="profile-card"
-          onClick={() => navigate('/myLearningPlan')}
-        >
-          <div className="profile-card-header">
-            <FaCalendarAlt className="profile-card-icon" />
-            <h3 className="profile-card-title">My Learning Plan</h3>
-          </div>
-          <p className="profile-card-content">
-            Track your scheduled learning activities and courses.
-          </p>
-        </div>
-
-        <div
-          className="profile-card"
-          onClick={() => navigate('/MylearningProgress')}
-        >
-          <div className="profile-card-header">
-            <FaChartLine className="profile-card-icon" />
-            <h3 className="profile-card-title">My Learning Progress</h3>
-          </div>
-          <p className="profile-card-content">
-            Monitor your skill development and course completions.
-          </p>
-        </div>
       </div>
     </div>
   );

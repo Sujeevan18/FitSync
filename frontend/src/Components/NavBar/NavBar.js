@@ -25,14 +25,7 @@ function NavBar() {
             <FaBook className="nav-icon" />
             <span>Posts</span>
           </div>
-          <div className="nav-item" onClick={() => navigate('/allLearningProgress')}>
-            <FaChartLine className="nav-icon" />
-            <span>Learning Progress</span>
-          </div>
-          <div className="nav-item" onClick={() => navigate('/allLearningPost')}>
-            <FaBook className="nav-icon" />
-            <span>Learning Posts</span>
-          </div>
+  
         </nav>
         
         <div className="nav-actions">

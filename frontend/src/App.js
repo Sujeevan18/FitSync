@@ -1,22 +1,14 @@
 import React, { useEffect } from "react";
 import { Route, Routes, Navigate } from "react-router";
 import { useNavigate } from "react-router-dom";
-import AddLeariningPost from "./Pages/LearningSystem/AddLeariningPost";
-import AllLearningPost from "./Pages/LearningSystem/AllLearningPost";
 import UserLogin from "./Pages/UserManagement/UserLogin";
 import UserRegister from "./Pages/UserManagement/UserRegister";
 import UpdateUserProfile from "./Pages/UserManagement/UpdateUserProfile";
-import AddLearningProgress from "./Pages/LearningProgress/AddLearningProgress";
-import AllLearningProgress from "./Pages/LearningProgress/AllLearningProgress";
-import UpdateLearningProgress from "./Pages/LearningProgress/UpdateLearningProgress";
 import NotificationsPage from "./Pages/NotificationManagement/NotificationsPage";
 import AddNewPost from "./Pages/PostManagement/AddNewPost";
 import AllPost from "./Pages/PostManagement/AllPost";
 import UpdatePost from "./Pages/PostManagement/UpdatePost";
 import UserProfile from "./Pages/UserManagement/UserProfile";
-import MyLearningProgress from "./Pages/LearningProgress/MyLearningProgress";
-import MyLearningPost from "./Pages/LearningSystem/MyLearningPost";
-import UpdateLearnPost from "./Pages/LearningSystem/UpdateLearnPost";
 import MyPost from "./Pages/PostManagement/MyPost";
 
 function ProtectedRoute({ children }) {
@@ -55,38 +47,9 @@ function App() {
           <Route path="/register" element={<UserRegister />} />
 
           {/* Protected Routes */}
-          <Route
-            path="/addLeariningPost"
-            element={
-              <ProtectedRoute>
-                <AddLeariningPost />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/allLearningPost"
-            element={
-              <ProtectedRoute>
-                <AllLearningPost />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/MylearningProgress"
-            element={
-              <ProtectedRoute>
-                <MyLearningProgress />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/updateLearnPost/:id"
-            element={
-              <ProtectedRoute>
-                <UpdateLearnPost />
-              </ProtectedRoute>
-            }
-          />
+          
+          
+          
           <Route
             path="/userProfile"
             element={
@@ -103,38 +66,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/addLearningProgress"
-            element={
-              <ProtectedRoute>
-                <AddLearningProgress />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/allLearningProgress"
-            element={
-              <ProtectedRoute>
-                <AllLearningProgress />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/myLearningPlan"
-            element={
-              <ProtectedRoute>
-                <MyLearningPost />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/updateLearningProgress/:id"
-            element={
-              <ProtectedRoute>
-                <UpdateLearningProgress />
-              </ProtectedRoute>
-            }
-          />
+          
           <Route
             path="/notifications"
             element={
