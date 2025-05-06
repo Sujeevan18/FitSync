@@ -99,20 +99,31 @@ const CreateWorkoutStatus = () => {
       date,
     };
 
+    console.log("Sending data to backend:", workoutStatusData);
+    console.log("Updating workout status with ID:", statusId); // Debugging the statusId
+
     try {
-      const res = editStatus
-        ? await axios.put(
-            `http://localhost:8080/WorkoutStatus/${statusId}`,
-            workoutStatusData
-          )
-        : await axios.post("http://localhost:8080/WorkoutStatus", workoutStatusData);
+      let res;
+      if (editStatus) {
+        res = await axios.put(
+          `http://localhost:8080/WorkoutStatus/${statusId}`,
+          workoutStatusData
+        );
+      } else {
+        res = await axios.post("http://localhost:8080/WorkoutStatus", workoutStatusData);
+      }
 
       if (res.status === 200 || res.status === 201) {
         toast.success(editStatus ? "Workout status updated" : "Workout status added");
         navigate("/WorkoutStatus");
+      } else {
+        toast.error("Failed to save workout status. Please try again.");
       }
     } catch (error) {
-      toast.error("Failed to save workout status");
+      console.error("Submission error:", error.response || error);
+      toast.error(
+        `Failed to save workout status: ${error.response?.data?.message || error.message}`
+      );
     }
   };
 
@@ -132,6 +143,15 @@ const CreateWorkoutStatus = () => {
     setWeight("");
     setDescription("");
     setDate(getTodayDate());
+  };
+
+  const handleRemoveEdit = () => {
+    setDistance("");
+    setPushups("");
+    setWeight("");
+    setDescription("");
+    setDate(getTodayDate());
+    navigate("/WorkoutStatus"); // Redirect to workout statuses list when "Remove Edit" is clicked
   };
 
   return (
@@ -228,20 +248,38 @@ const CreateWorkoutStatus = () => {
             />
           </div>
           <div className="flex flex-col space-y-4">
-            <button
-              type="submit"
-              className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
-            >
-              {editStatus ? "Confirm Edit" : "Create Status"}
-            </button>
-            {editStatus && (
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
-              >
-                Remove Edit
-              </button>
+            {editStatus ? (
+              <>
+                <button
+                  type="submit"
+                  className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
+                >
+                  Confirm Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRemoveEdit}
+                  className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
+                >
+                  Cancel Edit
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="submit"
+                  className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
+                >
+                  Create Status
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
+                >
+                  Cancel
+                </button>
+              </>
             )}
           </div>
         </form>

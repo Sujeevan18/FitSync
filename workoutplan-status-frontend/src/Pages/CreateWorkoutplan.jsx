@@ -11,7 +11,6 @@ const ChatBot = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Function to send the user input to the OpenAI API and get the response
   const sendMessage = async (e) => {
     if (e.key === "Enter" || e.type === "click") {
       if (!input) return;
@@ -33,7 +32,7 @@ const ChatBot = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer YOUR_OPENAI_API_KEY`, // Replace with your API Key
+              "Authorization": `Bearer YOUR_OPENAI_API_KEY`,
             },
           }
         );
@@ -66,10 +65,7 @@ const ChatBot = () => {
     <div className="fixed top-0 right-0 m-4 w-96 h-96 bg-white shadow-lg rounded-lg p-4 flex flex-col animate__animated animate__fadeIn">
       <div className="flex-grow overflow-y-auto space-y-4">
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`p-2 rounded-lg ${message.sender === "user" ? "bg-blue-100 text-right" : "bg-gray-100 text-left"}`}
-          >
+          <div key={index} className={`p-2 rounded-lg ${message.sender === "user" ? "bg-blue-100 text-right" : "bg-gray-100 text-left"}`}>
             <p>{message.text}</p>
           </div>
         ))}
@@ -79,19 +75,13 @@ const ChatBot = () => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={sendMessage} // Handle Enter key press
+          onKeyPress={sendMessage}
           placeholder="Ask me anything!"
           className="flex-grow p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <AiOutlineSend
-          onClick={sendMessage} // Handle click event for sending the message
-          className="cursor-pointer text-blue-500"
-          size={24}
-        />
+        <AiOutlineSend onClick={sendMessage} className="cursor-pointer text-blue-500" size={24} />
       </div>
-      {loading && (
-        <div className="text-center text-blue-500 mt-4">Processing your request...</div> // Loading text
-      )}
+      {loading && <div className="text-center text-blue-500 mt-4">Processing your request...</div>}
     </div>
   );
 };
@@ -145,7 +135,6 @@ const CreateWorkoutPlan = () => {
     }
   }, [workoutplan, workoutPlanId]);
 
-  // Function to reset the form to its initial state
   const resetForm = () => {
     setSelectedWorkout("Chest");
     setExercises("");
@@ -269,6 +258,8 @@ const CreateWorkoutPlan = () => {
           padding: "30px",
           borderRadius: "15px",
           boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+          maxWidth: "500px",
+          minWidth: "300px",
         }}
       >
         <h1 className="mb-6 text-3xl font-semibold text-center text-indigo-600">
@@ -354,26 +345,48 @@ const CreateWorkoutPlan = () => {
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows="4"
+              rows="3"
               className="mt-1 block w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
               placeholder="Describe your workout achievements..."
             ></textarea>
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="w-full mt-6 px-6 py-3 text-lg font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
-        >
-          {editWorkoutPlans ? "Confirm Edit" : "Submit Workout Plan"}
-        </button>
-        <button
-          onClick={handleRemoveEdit}
-          type="button"
-          className="w-full mt-4 px-6 py-3 text-lg font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
-        >
-          Remove Edit
-        </button>
+        <div className="flex flex-col space-y-4">
+          {editWorkoutPlans ? (
+            <>
+              <button
+                type="submit"
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
+              >
+                Confirm Edit
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveEdit}
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
+              >
+                Remove Edit
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="submit"
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
+              >
+                Submit Workout Plan
+              </button>
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+        </div>
       </form>
       <ChatBot /> {/* Embed ChatBot component */}
     </div>
