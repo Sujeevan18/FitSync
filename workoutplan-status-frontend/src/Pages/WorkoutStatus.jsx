@@ -41,24 +41,28 @@ const WorkoutStatus = ({ user }) => {
   };
 
   const navigateEditPage = (status) => {
-    navigate(`/CreateWorkoutStatus/${status.statusId}`);
+    navigate(`/CreateWorkoutStatus/${status.statusId}`, {
+      state: { workoutStatus: status }, // Pass the status data
+    });
   };
 
   return (
     <div
-      className="container mx-auto p-4 min-h-screen"
+      className="container mx-auto p-4 min-h-screen flex flex-col justify-between"
       style={{
         backgroundImage: `url(${backgroundImg})`,
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
-        backgroundAttachment: 'fixed'
-      }}>
+        backgroundAttachment: 'fixed',
+        minHeight: '100vh', // Ensures full height of the viewport
+      }}
+    >
       <div className="space-y-4 flex justify-center flex-col items-center">
         {workoutStatuses.map((status, index) => (
           <div
             key={index}
-            className="bg-white shadow-lg rounded-lg p-4 w-[600px]"
+            className="bg-white shadow-lg rounded-lg p-4 w-[600px] bg-opacity-80"
           >
             <div className="flex justify-between ">
               <div className="flex gap-3">
@@ -101,8 +105,8 @@ const WorkoutStatus = ({ user }) => {
               <li>Weight lifted: {status.weight}<span className="text-black text-xs">Kg </span> </li>
             </ul>
             <p className="mt-4 text-base text-neutral-600 dark:text-neutral-200">
-            {status.description}
-                </p>
+              {status.description}
+            </p>
           </div>
         ))}
       </div>
