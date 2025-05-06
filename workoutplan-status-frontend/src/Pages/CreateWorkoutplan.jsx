@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { AiOutlineSend } from "react-icons/ai";
-import axios from "axios";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import workoutBck from "../images/workoutBck.jpg";
 import toast from "react-hot-toast";
+import axios from "axios";
+import workoutBck from "../images/workoutBck.jpg"; // Background image
+import { AiOutlineSend } from "react-icons/ai";
 
 // ChatBot Component
 const ChatBot = () => {
@@ -145,6 +145,7 @@ const CreateWorkoutPlan = () => {
     }
   }, [workoutplan, workoutPlanId]);
 
+  // Function to reset the form to its initial state
   const resetForm = () => {
     setSelectedWorkout("Chest");
     setExercises("");
@@ -156,18 +157,40 @@ const CreateWorkoutPlan = () => {
   };
 
   const validateForm = () => {
-    if (!selectedWorkout.trim()) return toast.error("Workout is required");
-    if (!routine.trim()) return toast.error("Routine is required");
-    if (!exercises.trim()) return toast.error("Exercise name is required");
-    if (!sets || isNaN(sets) || sets <= 0) return toast.error("Sets must be a positive number");
-    if (!repetitions || isNaN(repetitions) || repetitions <= 0) return toast.error("Repetitions must be a positive number");
-    if (!description.trim()) return toast.error("Description is required");
-    if (!date) return toast.error("Date is required");
+    if (!selectedWorkout.trim()) {
+      toast.error("Workout Plan Name is required");
+      return false;
+    }
+    if (!routine.trim()) {
+      toast.error("Routine is required");
+      return false;
+    }
+    if (!exercises.trim()) {
+      toast.error("Exercise Name is required");
+      return false;
+    }
+    if (!sets || isNaN(sets) || sets <= 0) {
+      toast.error("Sets must be a positive number");
+      return false;
+    }
+    if (!repetitions || isNaN(repetitions) || repetitions <= 0) {
+      toast.error("Repetitions must be a positive number");
+      return false;
+    }
+    if (!description.trim()) {
+      toast.error("Description is required");
+      return false;
+    }
+    if (!date) {
+      toast.error("Date is required");
+      return false;
+    }
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     const workoutData = {
@@ -181,12 +204,15 @@ const CreateWorkoutPlan = () => {
     };
 
     try {
+      const url = `http://localhost:8080/workoutplan/${workoutPlanId}`;
+      console.log("Updating workout plan at URL:", url); // Log URL to ensure it's correct
+
       const res = editWorkoutPlans
-        ? await axios.put(
-            `http://localhost:8080/workoutplan/${workoutPlanId}`,
-            workoutData
-          )
-        : await axios.post(`http://localhost:8080/workoutplan`, workoutData);
+        ? await axios.put(url, workoutData) // Only send PUT if editing
+        : await axios.post("http://localhost:8080/workoutplan", workoutData);
+
+      console.log("Response status:", res.status);
+      console.log("Response data:", res.data);
 
       if (res.status >= 200 && res.status < 300) {
         toast.success(
@@ -195,16 +221,31 @@ const CreateWorkoutPlan = () => {
             : "Workout Plan Added Successfully"
         );
         resetForm();
-        navigate("/workoutplan"); // Navigate to workout plan list after submit
+        navigate("/workoutplan");
+      } else {
+        toast.error(
+          editWorkoutPlans
+            ? "Failed to update workout plan"
+            : "Failed to add workout plan"
+        );
       }
     } catch (error) {
-      console.error("Submission error:", error);
+      console.error("Submission error:", error.response || error);
       toast.error(
         editWorkoutPlans
-          ? "Failed to update workout plan"
-          : "Failed to add workout plan"
+          ? `Failed to update workout plan: ${error.response?.data?.message || error.message}`
+          : `Failed to add workout plan: ${error.response?.data?.message || error.message}`
       );
     }
+  };
+
+  const handleCancel = () => {
+    resetForm(); // Reset the form values on cancel
+  };
+
+  const handleRemoveEdit = () => {
+    resetForm();
+    navigate("/workoutplan"); // Redirect to workout plans list when "Remove Edit" is clicked
   };
 
   return (
@@ -327,11 +368,11 @@ const CreateWorkoutPlan = () => {
           {editWorkoutPlans ? "Confirm Edit" : "Submit Workout Plan"}
         </button>
         <button
-          onClick={() => navigate("/workoutplan")}
+          onClick={handleRemoveEdit}
           type="button"
           className="w-full mt-4 px-6 py-3 text-lg font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
         >
-          {editWorkoutPlans ? "Remove Edit" : "Cancel"}
+          Remove Edit
         </button>
       </form>
       <ChatBot /> {/* Embed ChatBot component */}

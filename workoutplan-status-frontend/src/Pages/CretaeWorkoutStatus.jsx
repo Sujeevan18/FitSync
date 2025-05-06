@@ -227,7 +227,7 @@ const CreateWorkoutStatus = () => {
               placeholder="Describe your workout..."
             />
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col space-y-4">
             <button
               type="submit"
               className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
