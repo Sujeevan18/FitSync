@@ -39,7 +39,6 @@ function AllPost() {
   };
 
   const handleUpdate = (postId) => {
-    console.log("upload")
     navigate(`/updatePost/${postId}`);
   };
 
