@@ -13,12 +13,11 @@ function AllPost() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      console.log("Hello")
       try {
         const response = await axios.get('http://localhost:8080/posts');
         setPosts(response.data);
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Error has fetched while posting :', error);
       }
     };
 
