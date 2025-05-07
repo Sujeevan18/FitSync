@@ -17,7 +17,7 @@ function AllPost() {
         const response = await axios.get('http://localhost:8080/posts');
         setPosts(response.data);
       } catch (error) {
-        console.error('Error has fetched while posting :', error);
+        console.error('Error fetcheing post :', error);
       }
     };
 
