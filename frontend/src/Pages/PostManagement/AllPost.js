@@ -25,7 +25,7 @@ function AllPost() {
   }, []);
 
   const handleDelete = async (postId) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+    const confirmDelete = window.confirm('Are you sure you want to delete this post ?');
     if (!confirmDelete) return;
 
     try {
@@ -39,6 +39,7 @@ function AllPost() {
   };
 
   const handleUpdate = (postId) => {
+    console.log("upload")
     navigate(`/updatePost/${postId}`);
   };
 
