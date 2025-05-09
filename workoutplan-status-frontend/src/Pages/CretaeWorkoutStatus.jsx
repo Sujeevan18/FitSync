@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
-import chestImg from "../images/chestImg.png"; // Background image for full UI
+import chestImg from "../images/chestImg.png";
 
 const CreateWorkoutStatus = () => {
   const [distance, setDistance] = useState("");
@@ -13,16 +13,14 @@ const CreateWorkoutStatus = () => {
   const [user, setUser] = useState({});
   const [editStatus, setEditStatus] = useState(false);
 
-  const { statusId } = useParams(); // Get the statusId from the URL params
-  const navigate = useNavigate(); // Use navigate to redirect the user
-  const location = useLocation(); // To get the state passed via navigation
-
-  const workoutStatusData = location.state?.workoutStatus; // Get the workout status data from location.state
+  const { statusId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const workoutStatusData = location.state?.workoutStatus;
 
   const getTodayDate = () => new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    // If workoutStatusData is passed via location state, use it to pre-fill the form
     if (workoutStatusData) {
       setDistance(workoutStatusData.distance);
       setPushups(workoutStatusData.pushups);
@@ -31,7 +29,6 @@ const CreateWorkoutStatus = () => {
       setDate(workoutStatusData.date);
       setEditStatus(true);
     } else if (statusId) {
-      // If statusId is available, fetch data from the backend
       const fetchSinglePost = async () => {
         try {
           const { data } = await axios.get(
@@ -49,8 +46,6 @@ const CreateWorkoutStatus = () => {
         }
       };
       fetchSinglePost();
-    } else {
-      setDate(getTodayDate());
     }
   }, [statusId, workoutStatusData]);
 
@@ -99,9 +94,6 @@ const CreateWorkoutStatus = () => {
       date,
     };
 
-    console.log("Sending data to backend:", workoutStatusData);
-    console.log("Updating workout status with ID:", statusId); // Debugging the statusId
-
     try {
       let res;
       if (editStatus) {
@@ -127,163 +119,144 @@ const CreateWorkoutStatus = () => {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:8080/WorkoutStatus/${statusId}`);
-      toast.success("Workout status deleted successfully");
-      navigate("/WorkoutStatus");
-    } catch (error) {
-      toast.error("Failed to delete workout status");
-    }
-  };
-
   const handleCancel = () => {
     setDistance("");
     setPushups("");
     setWeight("");
     setDescription("");
-    setDate(getTodayDate());
+    setDate("");
   };
 
   const handleRemoveEdit = () => {
-    setDistance("");
-    setPushups("");
-    setWeight("");
-    setDescription("");
-    setDate(getTodayDate());
-    navigate("/WorkoutStatus"); // Redirect to workout statuses list when "Remove Edit" is clicked
+    handleCancel();
+    navigate("/WorkoutStatus");
   };
 
   return (
     <div
-      className="min-h-screen flex justify-center items-center"
       style={{
         backgroundImage: `url(${chestImg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundAttachment: "fixed",
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         padding: "20px",
-        animation: "fadeIn 1s ease-in-out",
       }}
     >
-      <div
-        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg relative z-10"
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-xl transform transition-all duration-500"
         style={{
           backgroundColor: "rgba(255, 255, 255, 0.9)",
-          animation: "slideUp 0.5s ease-out",
+          padding: "30px",
+          borderRadius: "15px",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+          maxWidth: "500px",
+          minWidth: "300px",
         }}
       >
-        <h1 className="text-2xl font-bold text-center text-indigo-600 mb-6">
+        <h1 className="mb-6 text-3xl font-semibold text-center text-indigo-600">
           {editStatus ? "Confirm Edit" : "Create Workout Status"}
         </h1>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="distance" className="block text-sm font-medium">
-              Distance (km)
-            </label>
-            <input
-              type="number"
-              id="distance"
-              value={distance}
-              onChange={(e) => setDistance(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
-              placeholder="e.g. 5"
-              min="0"
-              step="any"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="pushups" className="block text-sm font-medium">
-              Push-ups
-            </label>
-            <input
-              type="number"
-              id="pushups"
-              value={pushups}
-              onChange={(e) => setPushups(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
-              placeholder="e.g. 30"
-              min="0"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="weight" className="block text-sm font-medium">
-              Weight (kg)
-            </label>
-            <input
-              type="number"
-              id="weight"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
-              placeholder="e.g. 50"
-              min="0"
-              step="any"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="date" className="block text-sm font-medium">
-              Date
-            </label>
-            <input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              min={getTodayDate()}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="description" className="block text-sm font-medium">
-              Workout Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-300"
-              rows="4"
-              placeholder="Describe your workout..."
-            />
-          </div>
-          <div className="flex flex-col space-y-4">
-            {editStatus ? (
-              <>
-                <button
-                  type="submit"
-                  className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
-                >
-                  Confirm Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRemoveEdit}
-                  className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
-                >
-                  Cancel Edit
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="submit"
-                  className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
-                >
-                  Create Status
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300"
-                >
-                  Cancel
-                </button>
-              </>
-            )}
-          </div>
-        </form>
-      </div>
+
+        <div className="mb-4">
+          <label className="block text-lg font-medium">Distance (km)</label>
+          <input
+            type="number"
+            value={distance}
+            onChange={(e) => setDistance(e.target.value)}
+            placeholder="e.g. 5"
+            min="0"
+            step="any"
+            className="w-full px-4 py-2 text-lg border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-lg font-medium">Push-ups</label>
+          <input
+            type="number"
+            value={pushups}
+            onChange={(e) => setPushups(e.target.value)}
+            placeholder="e.g. 30"
+            min="0"
+            className="w-full px-4 py-2 text-lg border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-lg font-medium">Weight (kg)</label>
+          <input
+            type="number"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            placeholder="e.g. 70"
+            min="0"
+            step="any"
+            className="w-full px-4 py-2 text-lg border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-lg font-medium">Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            min={getTodayDate()}
+            className="w-full px-4 py-2 text-lg border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-lg font-medium">Workout Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows="4"
+            placeholder="Describe your workout..."
+            className="w-full px-4 py-2 text-lg border-2 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          ></textarea>
+        </div>
+
+        <div className="flex flex-col space-y-4">
+          {editStatus ? (
+            <>
+              <button
+                type="submit"
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300"
+              >
+                Confirm Edit
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveEdit}
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300"
+              >
+                Cancel Edit
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="submit"
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-full shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300"
+              >
+                Create Status
+              </button>
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="w-full px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-full shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+        </div>
+      </form>
     </div>
   );
 };

@@ -12,54 +12,50 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
 
   const sendMessage = async (e) => {
-    if (e.key === "Enter" || e.type === "click") {
-      if (!input) return;
+  if (e.key === "Enter" || e.type === "click") {
+    if (!input.trim()) return;
 
-      const userMessage = { text: input, sender: "user" };
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-      setInput(""); // Clear the input field
+    const userMessage = { text: input, sender: "user" };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInput(""); // Clear the input field
+    setLoading(true);
 
-      setLoading(true); // Set loading to true while waiting for the response
-
-      try {
-        const response = await axios.post(
-          "https://api.openai.com/v1/completions",
-          {
-            model: "text-davinci-003",
-            prompt: input,
-            max_tokens: 150,
+    try {
+      const response = await axios.post(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are a helpful fitness chatbot." },
+            { role: "user", content: input }
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer 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`, // Replace with your actual key
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer YOUR_OPENAI_API_KEY`,
-            },
-          }
-        );
-
-        if (response.data.choices && response.data.choices[0]) {
-          const botMessage = {
-            text: response.data.choices[0].text.trim(),
-            sender: "bot",
-          };
-          setMessages((prevMessages) => [...prevMessages, botMessage]);
-        } else {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { text: "Sorry, I couldn't process your request. Please try again.", sender: "bot" },
-          ]);
         }
-      } catch (error) {
-        console.error("Error fetching response from OpenAI:", error);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: "Sorry, I couldn't process your request. Please try again.", sender: "bot" },
-        ]);
-      }
+      );
 
-      setLoading(false); // Set loading to false after receiving the response
+      const botReply = response.data.choices[0].message.content.trim();
+      const botMessage = { text: botReply, sender: "bot" };
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+    } catch (error) {
+      console.error("ChatBot Error:", error.response || error);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          text: "Sorry, I couldn't process your request. Please try again.",
+          sender: "bot",
+        },
+      ]);
     }
-  };
+
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="fixed top-0 right-0 m-4 w-96 h-96 bg-white shadow-lg rounded-lg p-4 flex flex-col animate__animated animate__fadeIn">
@@ -179,9 +175,9 @@ const CreateWorkoutPlan = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!validateForm()) return;
-
+  
     const workoutData = {
       sets: Number(sets),
       routine,
@@ -191,18 +187,20 @@ const CreateWorkoutPlan = () => {
       description,
       workoutPlanName: selectedWorkout,
     };
-
+  
+    console.log("WorkoutPlanId:", workoutPlanId); // Verify the workoutPlanId is correct
+  
     try {
       const url = `http://localhost:8080/workoutplan/${workoutPlanId}`;
-      console.log("Updating workout plan at URL:", url); // Log URL to ensure it's correct
-
+      console.log("URL for PUT request:", url); // Log the URL to check if it's correct
+  
       const res = editWorkoutPlans
         ? await axios.put(url, workoutData) // Only send PUT if editing
         : await axios.post("http://localhost:8080/workoutplan", workoutData);
-
+  
       console.log("Response status:", res.status);
       console.log("Response data:", res.data);
-
+  
       if (res.status >= 200 && res.status < 300) {
         toast.success(
           editWorkoutPlans
@@ -227,6 +225,7 @@ const CreateWorkoutPlan = () => {
       );
     }
   };
+  
 
   const handleCancel = () => {
     resetForm(); // Reset the form values on cancel
