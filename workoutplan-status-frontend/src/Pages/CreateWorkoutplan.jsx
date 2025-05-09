@@ -33,7 +33,8 @@ const ChatBot = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer YOUR_OPENAI_API_KEY`,
+            Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+
             // Authorization: `Bearer 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`, // Replace with your actual key
           },
         }
