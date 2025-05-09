@@ -12,52 +12,54 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
 
   const sendMessage = async (e) => {
-  if (e.key === "Enter" || e.type === "click") {
-    if (!input.trim()) return;
+    if (e.key === "Enter" || e.type === "click") {
+      if (!input) return;
 
-    const userMessage = { text: input, sender: "user" };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setInput(""); // Clear the input field
-    setLoading(true);
+      const userMessage = { text: input, sender: "user" };
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
+      setInput(""); // Clear the input field
 
-    try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "You are a helpful fitness chatbot." },
-            { role: "user", content: input }
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+      setLoading(true); // Set loading to true while waiting for the response
 
-            // Authorization: `Bearer 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`, // Replace with your actual key
+      try {
+        const response = await axios.post(
+          "https://api.openai.com/v1/completions",
+          {
+            model: "text-davinci-003",
+            prompt: input,
+            max_tokens: 150,
           },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer YOUR_OPENAI_API_KEY`,
+            },
+          }
+        );
+
+        if (response.data.choices && response.data.choices[0]) {
+          const botMessage = {
+            text: response.data.choices[0].text.trim(),
+            sender: "bot",
+          };
+          setMessages((prevMessages) => [...prevMessages, botMessage]);
+        } else {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: "Sorry, I couldn't process your request. Please try again.", sender: "bot" },
+          ]);
         }
-      );
+      } catch (error) {
+        console.error("Error fetching response from OpenAI:", error);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: "Sorry, I couldn't process your request. Please try again.", sender: "bot" },
+        ]);
+      }
 
-      const botReply = response.data.choices[0].message.content.trim();
-      const botMessage = { text: botReply, sender: "bot" };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-    } catch (error) {
-      console.error("ChatBot Error:", error.response || error);
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          text: "Sorry, I couldn't process your request. Please try again.",
-          sender: "bot",
-        },
-      ]);
+      setLoading(false); // Set loading to false after receiving the response
     }
-
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="fixed top-0 right-0 m-4 w-96 h-96 bg-white shadow-lg rounded-lg p-4 flex flex-col animate__animated animate__fadeIn">
